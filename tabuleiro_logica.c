@@ -115,7 +115,6 @@ void desenha_bola_direcao(Bola *bola, int matriz[HEIGHT][WIDTH], int direcao) {
     }
 }
 
-
 int main() {
     Bola *bola;
 

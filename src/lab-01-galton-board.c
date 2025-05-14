@@ -21,17 +21,29 @@ ssd1306_t oled;
 #define LEVEL_SPACING 8
 #define STEP_HORIZONTAL 12 // distância entre os centros dos obstáculos
 
+#define NUM_BOLA 5
+
+#define NUM_CASAS 8
+
 typedef struct Bola {
     int x_inicial;
     int x_final;
     int y_inicial;
     int y_final;
+    int status;
 } Bola;
 
 typedef enum {
     ESQUERDA = -1,
     DIREITA = 1
 } Direcao;
+
+Bola bolas[NUM_BOLA];
+
+char buffer[16];
+
+
+int contador_posicao[NUM_CASAS] = {0};
 
 
 // Para desenhar em matriz
@@ -164,17 +176,24 @@ void atualizarDisplay (int matriz[HEIGHT][WIDTH]) {
     ssd1306_show(&oled);
 };
 
-Bola *inicializa_bola() {
-    Bola *bola = malloc(sizeof(Bola));
+// Bola *inicializa_bola() {
 
-    if (bola == NULL) return NULL;
+//     bola->x_inicial = 62;
+//     bola->x_final = bola->x_inicial + 4;
+//     bola->y_inicial = 2;
+//     bola->y_final = bola->y_inicial + 4;
 
-    bola->x_inicial = 62;
-    bola->x_final = bola->x_inicial + 4;
-    bola->y_inicial = 2;
-    bola->y_final = bola->y_inicial + 4;
+//     return bola;
+// }
 
-    return bola;
+void inicializar_bolas() {
+    for (int i = 0; i < NUM_BOLA; i++) {
+        bolas[i].x_inicial = 62;
+        bolas[i].x_final   = bolas[i].x_inicial + 4;
+        bolas[i].y_inicial = 2;
+        bolas[i].y_final   = bolas[i].y_inicial + 4;
+        bolas[i].status    = false;
+    }
 }
 
 int calcular_casa_final(Bola *bola, int num_casas) {
@@ -187,6 +206,18 @@ int calcular_casa_final(Bola *bola, int num_casas) {
     if (casa < 0) casa = 0;
 
     return casa;
+}
+
+void mostrar_numero_bola(int numero) {
+    for (int y = 1; y < 15; y++) {
+        for (int x = 1; x < 50; x++) {
+            ssd1306_clear_pixel(&oled, x, y);
+        }
+    }
+
+    snprintf(buffer, sizeof(buffer), "Bola:%d", numero + 1); // +1 para exibir a partir de 1
+    ssd1306_draw_string(&oled, 5, 5, 1,buffer);
+    ssd1306_show(&oled);
 }
 
 int main() {
@@ -216,32 +247,55 @@ int main() {
     ssd1306_clear(&oled);
     ssd1306_show(&oled);
 
-    Bola *bola = inicializa_bola();
-
     atualizarDisplay(matriz);
 
     sleep_ms(2000);
 
-    desenhar_bola(bola);
+    inicializar_bolas();
 
-    for (int i = 0; i < 7; i++)
-    {
-        int rng = rand();
+    for (int b = 0; b < NUM_BOLA; b++) {
 
-        printf("rng: %d\n", rng);
+        mostrar_numero_bola(b);
 
-        if(rng % 2 == 0) 
-            mover_bola(bola, DIREITA);
-        else 
-            mover_bola(bola, ESQUERDA);
-        sleep_ms(1000);
+        Bola *bola = &bolas[b];
+
+        desenhar_bola(bola);
+
+        sleep_ms(350);
+
+        for (int i = 0; i < LEVELS - 1; i++) {
+            int rng = rand();
+            printf("rng: %d\n", rng);
+
+            if (rng % 2 == 0) 
+                mover_bola(bola, DIREITA);
+            else 
+                mover_bola(bola, ESQUERDA);
+
+            sleep_ms(100);
+        }
+
+        int casa_final = calcular_casa_final(bola, NUM_CASAS);
+        printf("casa final da bola %d: %d\n", b, casa_final);
+        contador_posicao[casa_final]++;
+
+        sleep_ms(100);
+        apagar_bola(bola);
     }
 
-    int casa_final = calcular_casa_final(bola, LEVELS);
+    fflush(stdout);
 
-    apagar_bola(bola);
+    printf("casa 1: %d\n", contador_posicao[0]);
+    printf("casa 2: %d\n", contador_posicao[1]);
+    printf("casa 3: %d\n", contador_posicao[2]);
+    printf("casa 4: %d\n", contador_posicao[3]);
+    printf("casa 5: %d\n", contador_posicao[4]);
+    printf("casa 6: %d\n", contador_posicao[5]);
+    printf("casa 7: %d\n", contador_posicao[6]);
 
-    printf("casa final: %d\n", casa_final);
-    
+    fflush(stdout);
+
+    printf("passou aqui");
+
     return 0;
 }
