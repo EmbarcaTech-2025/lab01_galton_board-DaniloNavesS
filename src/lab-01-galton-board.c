@@ -8,11 +8,13 @@
 // Biblioteca para uso do SSD1306, display OLED.
 #include "include/ssd1306.h"
 ssd1306_t oled;
-
 // Definições para uso de comunicação I2C com os pinos do display OLED.
 #define I2C_PORT i2c1
 #define I2C_SDA 14
 #define I2C_SCL 15
+// Botoes
+#define BUTTON_A 5
+#define BUTTON_B 6
 
 #define WIDTH 128
 #define HEIGHT 64
@@ -249,6 +251,15 @@ int main() {
     gpio_pull_up(I2C_SDA);
     gpio_pull_up(I2C_SCL);
 
+    // Inicializa os botoes
+    gpio_init(BUTTON_A);
+    gpio_set_dir(BUTTON_A, GPIO_IN);
+    gpio_pull_up(BUTTON_A);
+
+    gpio_init(BUTTON_B);
+    gpio_set_dir(BUTTON_B, GPIO_IN);
+    gpio_pull_up(BUTTON_B);
+
     if (!ssd1306_init(&oled, 128, 64, 0x3C, I2C_PORT))
     {
         printf("Parou aqui\n");
@@ -266,6 +277,21 @@ int main() {
     inicializar_bolas();
 
     for (int b = 0; b < NUM_BOLA; b++) {
+        int balaceamento = 50;
+
+        if (gpio_get(BUTTON_A) == 0) {
+            balaceamento = 30; // 30% para direita, 70% para esquerda
+        }
+    
+        // Checa se botão B está pressionado (balancear para direita)
+        else if (gpio_get(BUTTON_B) == 0) {
+            balaceamento = 70; // 70% para direita, 30% para esquerda
+        }
+    
+        // Se nenhum botão está pressionado, volta ao neutro
+        else {
+            balaceamento = 50;
+        }
 
         mostrar_numero_bola(b);
 
@@ -276,15 +302,16 @@ int main() {
         sleep_ms(350);
 
         for (int i = 0; i < LEVELS - 1; i++) {
-            int rng = rand();
+            int rng = rand() % 100;
             printf("rng: %d\n", rng);
 
-            if (rng % 2 == 0) 
+            if (rng < balaceamento)
                 mover_bola(bola, DIREITA);
-            else 
+            else
                 mover_bola(bola, ESQUERDA);
 
             sleep_ms(100);
+            printf("Balanceamento -> %d", balaceamento);
         }
 
         int casa_final = calcular_casa_final(bola, NUM_CASAS);
