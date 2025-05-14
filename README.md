@@ -37,6 +37,10 @@ O balanceamento é feito em tempo real, por meio dos **botões físicos da placa
 
 O algoritmo ajusta a probabilidade de cada movimento conforme o botão lido no início da queda de cada bola, resultando em uma distribuição assimétrica no histograma.
 
+## Proposta de melhorias
+
+Implementar uma organização de arquitetura entre as pasta para facilitar a manutenção.
+
 
 ## 📜 Licença
 MIT License - MIT GPL-3.0.
