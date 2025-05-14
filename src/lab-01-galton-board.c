@@ -21,7 +21,7 @@ ssd1306_t oled;
 #define LEVEL_SPACING 8
 #define STEP_HORIZONTAL 12 // distância entre os centros dos obstáculos
 
-#define NUM_BOLA 5
+#define NUM_BOLA 15
 
 #define NUM_CASAS 8
 
@@ -176,16 +176,6 @@ void atualizarDisplay (int matriz[HEIGHT][WIDTH]) {
     ssd1306_show(&oled);
 };
 
-// Bola *inicializa_bola() {
-
-//     bola->x_inicial = 62;
-//     bola->x_final = bola->x_inicial + 4;
-//     bola->y_inicial = 2;
-//     bola->y_final = bola->y_inicial + 4;
-
-//     return bola;
-// }
-
 void inicializar_bolas() {
     for (int i = 0; i < NUM_BOLA; i++) {
         bolas[i].x_inicial = 62;
@@ -220,12 +210,34 @@ void mostrar_numero_bola(int numero) {
     ssd1306_show(&oled);
 }
 
+void desenhar_histograma() {
+    int histograma_width = 3;  // Largura de cada barra do histograma
+    int max_height = HEIGHT - 10;  // Altura máxima para o histograma (considerando algum espaço para margem)
+
+    // Desenhando as barras do histograma
+    for (int i = 0; i < NUM_CASAS; i++) {
+        int altura_barra = (contador_posicao[i] * max_height) / NUM_BOLA;  // Normalizando a altura
+
+        // Desenhando a barra no histograma
+        for (int y = HEIGHT - altura_barra; y < HEIGHT; y++) {
+            for (int x = i * histograma_width; x < (i + 1) * histograma_width; x++) {
+                if (x >= 0 && x < WIDTH && y >= 0 && y < HEIGHT) {
+                    ssd1306_draw_pixel(&oled, x, y);  // Desenha o pixel da barra
+                }
+            }
+        }
+    }
+
+    ssd1306_show(&oled);
+}
+
+
 int main() {
     stdio_init_all();
 
     srand(to_us_since_boot(get_absolute_time()));
 
-    sleep_ms(2000);
+    sleep_ms(500);
 
     int matriz[HEIGHT][WIDTH];
 
@@ -278,24 +290,19 @@ int main() {
         int casa_final = calcular_casa_final(bola, NUM_CASAS);
         printf("casa final da bola %d: %d\n", b, casa_final);
         contador_posicao[casa_final]++;
+        desenhar_histograma();
 
         sleep_ms(100);
         apagar_bola(bola);
     }
 
     fflush(stdout);
-
-    printf("casa 1: %d\n", contador_posicao[0]);
-    printf("casa 2: %d\n", contador_posicao[1]);
-    printf("casa 3: %d\n", contador_posicao[2]);
-    printf("casa 4: %d\n", contador_posicao[3]);
-    printf("casa 5: %d\n", contador_posicao[4]);
-    printf("casa 6: %d\n", contador_posicao[5]);
-    printf("casa 7: %d\n", contador_posicao[6]);
-
+    for (int i = 0; i < NUM_CASAS; i++)
+    {
+        printf("casa %d: %d\n", i ,contador_posicao[i]);
+    }
+    
     fflush(stdout);
-
-    printf("passou aqui");
 
     return 0;
 }

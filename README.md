@@ -21,7 +21,7 @@ Este projeto simula uma Galton Board (ou Quadro de Galton) utilizando o microcon
 Nesta versão inicial, o sistema simula a queda de uma única bola por vez. Assim que o usuário inicia a simulação (por exemplo, ao resetar o dispositivo), uma bola percorre o tabuleiro linha por linha, desviando aleatoriamente para a esquerda ou para a direita nos obstáculos. Ao chegar ao final, a casa correspondente é atualizada e exibida no terminal.
 
 **Versão 2 — Queda contínua com múltiplas bolas**
-Na segunda versão, o sistema evolui para simular a queda contínua de várias bolas. Uma nova bola é lançada automaticamente assim que a anterior atinge o final do tabuleiro, permitindo observar a formação de uma distribuição probabilística em tempo real. O número da bola atual é exibido no canto do display OLED e a contagem de bolas por casa é atualizada dinamicamente no terminal. Essa versão proporciona uma visualização mais fiel ao funcionamento estatístico da Galton Board.
+Na segunda versão, o sistema evolui para simular a queda contínua de várias bolas. Uma nova bola é lançada automaticamente assim que a anterior atinge o final do tabuleiro, permitindo observar a formação de uma distribuição probabilística em tempo real. O número da bola atual é exibido no canto do display OLED e a contagem de bolas por casa é atualizada dinamicamente no terminal. Além disso, é possível ver um **histograma** no display oled.
 
 
 ## 📜 Licença
